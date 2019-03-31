@@ -20,7 +20,8 @@ $useridnow=$json1[0]['USERID'];
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     </head>
-    <body >
+    <body onload="searchviewhistory()">
+    <input type="text" id="useridnow" style="display:none" value=<?php echo '"'.$useridnow.'"';?>>
 <!--head bar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="width:80%;left:10%">
   <a class="navbar-brand" href="#">SecondHandCar</a>
@@ -75,35 +76,6 @@ $useridnow=$json1[0]['USERID'];
 
 <br>
 <br>
-<?php 
-$username="huanbin";
-$password="24361Zhb1152";
-$connection_string="oracle.cise.ufl.edu:1521/orcl";
-global $con;
-$con=oci_connect($username,$password,$connection_string);
-$query="SELECT * FROM (CAR NATURAL JOIN VIEW_HISTORY) WHERE USERID=:userid ORDER BY TIME DESC ";
-$stmt = oci_parse($con, $query);
-oci_bind_by_name($stmt, ":userid",$useridnow);
-oci_execute($stmt);
-while($r=oci_fetch_array($stmt, OCI_ASSOC)){
-    echo "<div class='card mb-3' style='width:80%;left:10%'>";
-    echo "<div class='row no-gutters'>";
-    echo "<div class='col-md-4'>";
-    echo "<img src='".$r['PICTURE']."' class='card-img' alt='...'>";
-    echo "</div>";
-    echo "<div class='col-md-8'>";
-    echo "<div class='card-body'>";
-    echo "<h5 class='card-title'>Card title</h5>";
-    echo "<p class='card-text'>".$r['MODEL']."</p>";
-    echo "<p class='card-text'><small class='text-muted'>".$r['TIME']."</small></p></div></div></div></div>";
-    
-}
-
-    oci_close($con);
-?>
-
-<br>
-<br>
 
 <div id="list">
 </div>
@@ -120,7 +92,134 @@ while($r=oci_fetch_array($stmt, OCI_ASSOC)){
 
 <script type="text/javascript">
 
+var result;
+var currentpage;
+var pagenumber;
+var pagesize=20;
 
+function searchviewhistory(){	
+	//var paraarray=getParams(window.location.toString());
+
+	var json= '{"action":"searchviewhistory","userid":'+document.getElementById('useridnow').value;
+	json=json+'}';
+	//alert(json);
+	var json1=datarequest(json);
+	//alert(json1);
+	result =  JSON.parse(json1);
+	pagenumber=Math.ceil(result.length/pagesize);
+	currentpage=0;
+	pagechange(1);
+	
+}
+
+function toNonExponential(num) {
+    var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/);
+    return num.toFixed(Math.max(0, (m[1] || '').length - m[2]));
+}
+
+function getFullNum(num){
+
+    if(isNaN(num)){return num};
+
+    var str = ''+num;
+    if(!/e/i.test(str)){return num;};
+    
+    return (num).toFixed(18).replace(/\.?0+$/, "");
+}
+
+function pagechange(number){
+	if(currentpage==number) return;
+	currentpage=number;
+	document.getElementById('list').innerHTML="";
+
+
+	//alert("111");
+	for(var i=(currentpage-1)*pagesize;i<currentpage*pagesize&&i<result.length;i++){
+		var card="<div class='card mb-3' style='width:80%;left:10%;height:15rem;'>";
+		card+="<div class='row no-gutters'>";
+		card+="<div class='col-md-4'>";
+		
+		card+="<img src='"+result[i]['PICTURE']+"' class='card-img' alt='...' style='height:15rem;width:auto'></div>";
+		
+		var xx=new Number(result[i]['PRICE']);
+		card+="<div class='col-md-8'><div class='card-body'>";
+		
+		card+="<h5 class='card-title'>"+result[i]['MODEL']+"</h5>";
+		
+		card+="<p class='card-text' >"+toNonExponential(xx)+"</p>";
+		
+		card+="<p class='card-text' style='text-align:right'><small class='text-muted'>"+result[i]['TIME']+"</small></p>";
+		card+="<div align='right'>";
+		card+="<a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary' >View</a>";
+		card+="</div></div></div></div></div><br>";
+		//alert(document.getElementById('list').innerHTML);
+		document.getElementById('list').innerHTML+=card;
+	}
+	
+	var pa="<ul class='pagination justify-content-center'>";
+	pa+="<li class='page-item'>";
+	pa+="<a class='page-link' href='javascript:void(0);'  onclick='pageminus();' aria-disabled='false'>Previous</a></li>";
+	for(var i=1;i<=1;i++){
+		if(i!=number){
+	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
+		}
+		else{
+			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
+		    pa+="</li>";		
+		}
+	}
+	if(number>4)
+		pa+="&nbsp;&nbsp;&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	var st=2;
+	if(number-2>st) st=number-2;
+	for(var i=st;i<=number+2&&i<pagenumber;i++){
+		if(i!=number){
+	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
+		}
+		else{
+			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
+		    pa+="</li>";		
+		}
+	}
+	if(number<pagenumber-3)
+		pa+="...";
+	if(pagenumber>1){
+	for(var i=pagenumber;i<=pagenumber;i++){
+		if(i!=number){
+	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
+		}
+		else{
+			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
+		    pa+="</li>";		
+		}
+	}
+	}
+	pa+="<li class='page-item'>";
+	pa+="<a class='page-link' href='javascript:void(0);'  onclick='pageplus();'>Next</a></li></ul>";
+	document.getElementById('page').innerHTML=pa;
+}
+function pageminus(){
+	if(currentpage>1)
+		pagechange(currentpage-1);
+}
+function pageplus(){
+	if(currentpage<pagenumber)
+		pagechange(currentpage+1);
+}
+
+function datarequest(json){
+	var request=new XMLHttpRequest();
+	request.open("POST","../part2/dbms.php",false); 
+	request.setRequestHeader("Content-type", "application/json");
+	var ttttt;
+	request.onreadystatechange=function(){
+	  if (request.readyState==4 && request.status==200 || request.status==304){
+		    ttttt=request.responseText;
+	  }
+	}  
+     request.send(json);
+     return ttttt;
+}
 
 </script>
 
