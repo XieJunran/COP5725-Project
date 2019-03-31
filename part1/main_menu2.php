@@ -99,7 +99,7 @@ $userid=$json1[0]['USERNAME'];
         echo "<a class='dropdown-item' href='#'>Account</a>";
         echo "<a class='dropdown-item' href='#'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
-        echo "<a class='dropdown-item' href='interest.php'>Interesting List</a>";
+        echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";
         echo "<div class='dropdown-divider'></div>";
         echo "<a class='dropdown-item' href='Logout.php'>Exit</a>";
         echo "</div>";
@@ -604,7 +604,7 @@ function pagechange(number){
 	for(var i=(currentpage-1)*pagesize;i<currentpage*pagesize&&i<result.length;i++){
 		if(i%5==0)
 			card+="<br><br><div class='card-group' style='width:80%;left:10%'>";
-		card+="<div class='card' style='left:12.5%;width: 16%;hight:20rem;position:relative;display:inline-block'>";
+		card+="<div class='card' style='left:12.5%;width: 16%;height:20rem;position:relative;display:inline-block'>";
 		card+="<img src='"+result[i]['PICTURE']+"' class='card-img-top' alt='...' style='top:0px'>";
 		card+="<div class='card-body'>";
 		//var mo="";

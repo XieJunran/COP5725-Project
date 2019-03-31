@@ -2,7 +2,7 @@
 session_start();
 //if(!session_is_registered(userID)){
 if(!isset($_SESSION['userID'])){
-   header("location:Login.php");
+    header("location:Login.php");
 }
 $json_data=$_SESSION['json_data'];
 $json1=(array) json_decode($json_data,1);
@@ -62,7 +62,7 @@ $useridnow=$json1[0]['USERID'];
         echo "<a class='dropdown-item' href='#'>Account</a>";
         echo "<a class='dropdown-item' href='#'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
-        echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";
+        echo "<a class='dropdown-item' href='interest.php'>Interesting List</a>";
         echo "<div class='dropdown-divider'></div>";
         echo "<a class='dropdown-item' href='Logout.php'>Exit</a>";
         echo "</div>";
@@ -100,7 +100,7 @@ var pagesize=20;
 function searchviewhistory(){	
 	//var paraarray=getParams(window.location.toString());
 
-	var json= '{"action":"searchviewhistory","userid":'+document.getElementById('useridnow').value;
+	var json= '{"action":"searchinterest","userid":'+document.getElementById('useridnow').value;
 	json=json+'}';
 	//alert(json);
 	var json1=datarequest(json);
@@ -148,7 +148,6 @@ function pagechange(number){
 		
 		card+="<p class='card-text' >"+toNonExponential(xx)+"</p>";
 		
-		card+="<p class='card-text' style='text-align:right'><small class='text-muted'>"+result[i]['TIME']+"</small></p>";
 		card+="<div align='right'>";
 		card+="<a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary' >View</a>";
 		card+="</div></div></div></div></div><br>";
