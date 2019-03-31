@@ -33,12 +33,30 @@ switch($data["action"])
     case "adddataformat":adddataformat();break;
     case "deleteformat":deleteformat();break;
     case "sharedata":sharedata();break;
-    case "searchchoose":searchchoose();break;
+    case "searchviewhistory":searchviewhistory();break;
     case "multisearch":multisearch();break;
     default:break;
 }
 
 oci_close($con);
+
+function searchviewhistory(){
+    global $data;
+    global $con;
+    $userid=$data["userid"];
+    $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $query="SELECT * FROM (CAR NATURAL JOIN VIEW_HISTORY) WHERE USERID=:userid ORDER BY TIME DESC ";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso); 
+}
 
 function multisearch(){
     global $data;
@@ -240,11 +258,8 @@ function logincheck()
     oci_bind_by_name($stmt, ":pw",$password);
     oci_execute($stmt);
     $records=array();
-    if(oci_fetch_all($stmt, $record)==1){
-        while($r = oci_fetch_array($stmt,OCI_ASSOC))
-        {
-            $records[] = $r;
-        }
+    if($r = oci_fetch_array($stmt,OCI_ASSOC)){
+        $records[] = $r;
         session_start();
         $json_data=json_encode($records);
         $_SESSION['userID']="";
