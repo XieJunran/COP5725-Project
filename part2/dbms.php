@@ -31,14 +31,32 @@ switch($data["action"])
     case "changepassword":changepassword();break;
     case "forgetpassword":forgetpassword();break;
     case "adddataformat":adddataformat();break;
-    case "deleteformat":deleteformat();break;
-    case "sharedata":sharedata();break;
+    case "searchorderhistory":searchorderhistory();break;
+    case "searchinterest":searchinterest();break;
     case "searchviewhistory":searchviewhistory();break;
     case "multisearch":multisearch();break;
     default:break;
 }
 
 oci_close($con);
+
+function searchorderhistory(){
+    global $data;
+    global $con;
+    $userid=$data["userid"];
+    $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $query="SELECT * FROM (CAR NATURAL JOIN ORDER_HISTORY) WHERE BUYER=:userid ORDER BY TIME DESC ";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
 
 function searchviewhistory(){
     global $data;
@@ -56,6 +74,21 @@ function searchviewhistory(){
         $jso[] = $row;
     }
     echo json_encode($jso); 
+}
+
+function searchinterest(){
+    global $data;
+    global $con;
+    $userid=$data["userid"];
+    $query="SELECT * FROM (CAR NATURAL JOIN INTEREST) WHERE USERID=:userid";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
 }
 
 function multisearch(){
