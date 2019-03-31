@@ -1,4 +1,5 @@
 <?php
+session_start();
 function parseUrlParam($query){
     $queryArr = explode('&', $query);
     $params = array();
@@ -52,19 +53,30 @@ if(isset($_SESSION['userID'])){
     oci_bind_by_name($stmt, ":carid",$carid);
     oci_execute($stmt);
     if(oci_fetch_array($stmt,OCI_ASSOC)){
+        $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
+        $stmt = oci_parse($con, $query);
+        oci_execute($stmt);
         $query="UPDATE VIEW_HISTORY SET DATE=(SELECT SYSDATE FROM DUAL) WHERE USERID=:userid AND CARID=:carid";
         $stmt = oci_parse($con, $query);
         oci_bind_by_name($stmt, ":userid",$useridnow);
         oci_bind_by_name($stmt, ":carid",$carid);
         oci_execute($stmt);
+        $query="COMMIT";
+        $stmt = oci_parse($con, $query);
+        oci_execute($stmt);
     }
     else{
+        $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
+        $stmt = oci_parse($con, $query);
+        oci_execute($stmt);
         $query="INSERT INTO VIEW_HISTORY VALUES (:userid,:carid,(SELECT SYSDATE FROM DUAL))";
         $stmt = oci_parse($con, $query);
         oci_bind_by_name($stmt, ":userid",$useridnow);
         oci_bind_by_name($stmt, ":carid",$carid);
         oci_execute($stmt); 
+        $query="COMMIT";
+        $stmt = oci_parse($con, $query);
+        oci_execute($stmt);
     }
     }
-}
 ?>
