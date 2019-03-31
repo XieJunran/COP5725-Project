@@ -1,0 +1,177 @@
+<?php
+	$json =file_get_contents( "php://input" );
+	$data=json_decode($json,true);
+	$rownum=9;
+	$columnnum=5;
+	$con=mysqli_connect("127.0.0.1","root","1","vote_database");
+        // Check connection
+        if (mysqli_connect_errno())
+        {
+            echo "Failed to connect to MySQL: " . mysqli_connect_error();
+        }
+
+	$groupID=$data["0"];
+	$votesuccess=0;
+
+	$selectquery="SELECT * FROM data WHERE id='$groupID'";
+	$selectrecords = array();
+	if ($selectresult = mysqli_query($con, $selectquery)) {
+	    if(mysqli_num_rows($selectresult)==1){		
+		while($sr = mysqli_fetch_assoc($selectresult))
+		{
+		    $selectrecords[] = $sr;
+		}	
+	    }
+	    else{
+		$message = "Something Wrong";
+		//echo "<script type='text/javascript'>alert('$message');</script>";
+	
+	    }
+            mysqli_free_result($result);			
+	}
+	else{
+		//create row
+	}
+	$XaB=array();
+	for($i=1;$i<=$rownum; $i++){
+	    $XaB_row=array();	
+            for($j=1; $j<=$columnnum; $j++){
+		
+		$index=($i-1)*$columnnum+$j;
+		$formmer=$selectrecords[0]["v$i$j"]+0;
+		$addnum=$data["$index"]+0;		
+                $encrypted_data=$formmer+$addnum;
+		$XaB_row[]=$encrypted_data;
+                $query="UPDATE data SET v$i$j='0' WHERE id='$groupID'";
+		//$query="SELECT * FROM data WHERE id=1";
+		if ($result = mysqli_query($con, $query)) {
+			$votesuccess=1;
+		}
+		else{	
+			break;
+		}
+		/* free result set */
+		mysqli_free_result($result);
+ 
+            }
+	    $XaB[]=$XaB_row;
+        }
+	if($votesuccess==1){
+		echo "DONE"."<hr>";
+	}
+        mysqli_close;
+	$matrixA=array();
+	$matrixA[]=array(0.5877,0.5864,0.1526,-0.2059,0.1468,-0.2190,-0.2985,-0.0410,0.2910);
+	$matrixA[]=array(-0.3121,0.3284,-0.1570,-0.1780,0.5286,-0.0909,0.6281,0.0163,0.2364);
+	$matrixA[]=array(0.0404,0.1271,-0.2012,0.3955,0.5935,0.3222,-0.3335,0.3571,-0.3010);
+	$matrixA[]=array(0.2139,0.1464,0.5409,0.3596,0.0974,0.1176,0.3653,-0.4371,-0.4039);
+	$matrixA[]=array(-0.3916,0.2642,0.6419,-0.1421,-0.1545,0.3136,-0.0892,0.4504,0.1074);
+	$matrixA[]=array(0.3651,-0.3184,0.0042,-0.2805,0.1367,0.7321,0.1431,-0.1007,0.3184);
+	$matrixA[]=array(-0.0848,0.2887,-0.2090,0.6512,-0.3192,0.2253,0.0472,-0.1211,0.5218);
+	$matrixA[]=array(0.4440,0.0773,-0.1482,0.0636,-0.3248,-0.0263,0.4885,0.6224,-0.1965);
+	$matrixA[]=array(0.1374,-0.5002,0.3758,0.3366,0.2955,-0.3746,0.0491,0.2537,0.4265);
+
+	$matrixB=array();
+	$matrixB[]=array('-0.0417', ' 0.8559', '0.4556', '-0.0309', '-0.2389');
+	$matrixB[]=array('-0.2300', '-0.1341', '0.3547', '0.8880', '0.1213');
+	$matrixB[]=array('-0.0966', '0.2334', '0.0450', '-0.1384', '0.9566');
+	$matrixB[]=array('0.6893', '-0.2890', '0.6442', '-0.1348', '0.0903');
+	$matrixB[]=array('0.6789', '0.3338', '-0.4995', '0.4161', '0.0708');
+
+
+
+	echo "XaB , 9 by 5"."<br>";
+	echoMatrix($rownum,$columnnum,$XaB);
+	echo "<hr>";
+	columnsum($rownum,$columnnum, $XaB);
+	echo "<hr>";
+
+	$AXaB=matrixMultiply($rownum,$rownum,$columnnum,$matrixA,$XaB);
+	
+	echo "AXaB , 9 by 5"."<br>";
+	echoMatrix($rownum,$columnnum,$AXaB);
+	echo "<hr>";
+	columnsum($rownum,$columnnum, $AXaB);
+	echo "<hr>";	
+
+	$AXa=matrixMultiply($rownum,$columnnum,$columnnum,$AXaB,transpose($columnnum, $matrixB));
+	//$AXa=matrixMultiply($rownum,$rownum,$rownum,$matrixA,transpose($rownum, $matrixA));
+	echo "AXa , 9 by 5"."<br>";
+	echoMatrix($rownum,$columnnum,$AXa);
+	//echoMatrix($rownum,$rownum,$AXa);
+	echo "<hr>";
+	columnsum($rownum,$columnnum, $AXa);
+	//columnsum($rownum,$rownum, $AXa);
+	echo "<hr>";
+
+	function matrixMultiply($row1,$row2,$column2, $p, $q) {
+	    //init result
+	    $r = array();
+	    for($i=0; $i<$row1; $i++) {
+		$t = array();
+		for($j=0; $j<$column2; $j++) {
+		    $t[] = 0;            
+		}
+		$r[] = $t;        
+	    }
+	    
+	    //do the matrix multiply
+	    for($i=0; $i<$row1; $i++) {
+		for($j=0; $j<$column2; $j++) {
+		    $t = 0;
+		    for($k=0; $k<$row2; $k++) {
+		        $t += $p[$i][$k] * $q[$k][$j];  
+		    }            
+		    $r[$i][$j] = $t;
+		}
+	    }
+	    
+	    //return result
+	    return $r;
+	}
+
+	function echoMatrix($row,$column, $r) {
+	    for($i=0; $i<$row; $i++) {
+		for($j=0; $j<=$column; $j++) {
+		    if ($j==$column)
+		        echo "<br>";
+		    else
+		        echo $r[$i][$j];
+		    if ($j<($column-1))
+		        echo "  ,  ";            
+		}   
+	    }    
+	}
+
+	function transpose($N, $rt) {
+	    for($i=0; $i<$N; $i++) {
+		$t = array();
+		for($j=0; $j<$N; $j++) {
+		    $t[] = 0;            
+		}
+		$r[] = $t;        
+	    }
+
+
+	    for($i=0; $i<$N; $i++) {
+		for($j=0; $j<=$N; $j++) {
+			 $r[$i][$j] = $rt[$j][$i];         
+		}   
+	    } 
+	    return $r;
+	}
+
+	function columnsum($row,$column, $r) {
+	    for($j=0; $j<$column; $j++) {
+		$sum=0;
+		for($i=0; $i<$row; $i++){
+			$sum+=$r[$i][$j];          
+		}
+		echo $sum;
+		if ($j<($column-1))
+			echo "  ,  ";     
+	    } 
+	    echo "<br>";
+	}	
+	
+?>
