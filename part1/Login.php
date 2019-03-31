@@ -78,7 +78,7 @@ function datarequest(json){
 	request.onreadystatechange=function(){
 	  if (request.readyState==4 && request.status==200 || request.status==304){
 		  if(request.responseText=="success!")
-		  window.location="main_menu1.php";
+		  window.location="main_menu2.php";
 		  else
 			  alert(request.responseText);			  
 	  }

@@ -1,3 +1,14 @@
+<?php
+session_start();
+//if(!session_is_registered(userID)){
+//if(!isset($_SESSION['userID'])){
+ //   header("location:Login.php");
+//}
+$json_data=$_SESSION['json_data'];
+$json1=(array) json_decode($json_data,1);
+$userid=$json1[0]['USERNAME'];
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -29,7 +40,14 @@
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          State
+          <?php 
+          $url=$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+          $statenow=getUrlParam('state',$url);
+          if($statenow!='')
+              echo $statenow;
+          else 
+              echo 'STATE';
+          ?>
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
         <form class="px-4 py-3">
@@ -63,10 +81,32 @@
       <li class="nav-item">
         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
       </li>
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="button">Login</button>
-    </form>
+    
+ </ul>
+    <li class="nav-item dropdown">
+    <?php 
+    
+    if(!isset($_SESSION['userID'])){
+        echo "<form class='form-inline my-2 my-lg-0'>";
+        echo "<button class='btn btn-outline-success my-2 my-sm-0' type='button' onclick='window.location='Login.php';'>Login</button>";
+        echo "</form>";
+    }
+    else{
+        echo "<a class='nav-link dropdown-toggle' href='#' id='navbarDropdown' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>";
+        echo $userid;
+        echo "</a>";
+        echo "<div class='dropdown-menu' aria-labelledby='navbarDropdown'>";
+        echo "<a class='dropdown-item' href='#'>Account</a>";
+        echo "<a class='dropdown-item' href='#'>Order history</a>";
+        echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
+        echo "<a class='dropdown-item' href='interest.php'>Interesting List</a>";
+        echo "<div class='dropdown-divider'></div>";
+        echo "<a class='dropdown-item' href='Logout.php'>Exit</a>";
+        echo "</div>";
+    }
+?>
+</li>
+
   </div>
 </nav>
 
@@ -560,25 +600,27 @@ function pagechange(number){
 	if(currentpage==number) return;
 	currentpage=number;
 	document.getElementById('list').innerHTML="";
-	
+	var card="";
 	for(var i=(currentpage-1)*pagesize;i<currentpage*pagesize&&i<result.length;i++){
-		if(i!=(currentpage-1)*pagesize&&i%5==0)
-			document.getElementById('list').innerHTML+="<br><br>";
-		var card="<div class='card' style='width: 16%;hight:20rem;position:relative;left:10%;display:inline-block'>";
+		if(i%5==0)
+			card+="<br><br><div class='card-group' style='width:80%;left:10%'>";
+		card+="<div class='card' style='left:12.5%;width: 16%;hight:20rem;position:relative;display:inline-block'>";
 		card+="<img src='"+result[i]['PICTURE']+"' class='card-img-top' alt='...' style='top:0px'>";
 		card+="<div class='card-body'>";
-		var mo="";
-		for(var j=result[i]['MODEL'].length;j<50;j++) mo+="&nbsp;";
-		card+="<p class='card-text'>"+result[i]['MODEL']+mo+"</p>";
+		//var mo="";
+		//for(var j=result[i]['MODEL'].length;j<50;j++) mo+="&nbsp;";
+		card+="<p class='card-text'>"+result[i]['MODEL']+"</p>";
 		var xx=new Number(result[i]['PRICE']);
 		card+="<p class='card-text' style='text-align:right'>"+toNonExponential(xx)+"</p>";
 		card+="<a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary'>View</a>";
 		card+="</div>";
 		card+="</div>";
-		document.getElementById('list').innerHTML+=card;
+		if(i%5==4)
+			card+="</div>";
 		
 		//alert(document.getElementById('list').innerHTML);
 	}
+	document.getElementById('list').innerHTML=card;
 	var pa="<ul class='pagination justify-content-center'>";
 	pa+="<li class='page-item'>";
 	pa+="<a class='page-link' href='javascript:void(0);'  onclick='pageminus();' aria-disabled='false'>Previous</a></li>";

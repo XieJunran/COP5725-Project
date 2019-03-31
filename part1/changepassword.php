@@ -31,7 +31,7 @@ else{
 <input type="text" id="code" style="display:none" value="<?php echo $code?>"/>
 <form id="msform">
 	<fieldset>
-		<h2 class="fs-title">Medical Share System</h2>
+		<h2 class="fs-title">Second Hand Car</h2>
 		<h3 class="fs-subtitle">Changepassword</h3>
 		<input type="password" id="password" name="lname" placeholder="NewPassword" />
 		<input type="password" id="cpassword" name="rname" placeholder="ConfirmNewPassword" />
