@@ -30,7 +30,7 @@ switch($data["action"])
     case "checkrequest":checkrequest();break;
     case "changepassword":changepassword();break;
     case "forgetpassword":forgetpassword();break;
-    case "adddataformat":adddataformat();break;
+    case "analyze1":analyze1();break;
     case "searchorderhistory":searchorderhistory();break;
     case "searchinterest":searchinterest();break;
     case "searchviewhistory":searchviewhistory();break;
@@ -39,7 +39,18 @@ switch($data["action"])
 }
 
 oci_close($con);
-
+function analyze1(){
+    global $data;
+    global $con;
+    $query="select brand,count(distinct c.carid) as num from car c,order_history o where c.carid=o.carid and buyer in( select buyer from( select buyer,rank() over(order by count(distinct carid) desc) as rank from order_history group by  buyer) where rank<50) group by brand having count(distinct c.carid)>10 order by count(distinct c.carid) desc";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);    
+}
 function searchorderhistory(){
     global $data;
     global $con;
