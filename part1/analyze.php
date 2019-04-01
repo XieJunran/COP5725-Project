@@ -1,13 +1,14 @@
 <?php
 session_start();
 //if(!session_is_registered(userID)){
-if(!isset($_SESSION['userID'])){
-   header("location:Login.php");
-}
+if(isset($_SESSION['userID'])){
 $json_data=$_SESSION['json_data'];
 $json1=(array) json_decode($json_data,1);
 $userid=$json1[0]['USERNAME'];
 $useridnow=$json1[0]['USERID'];
+}
+else 
+    $useridnow='';
 ?>
 
 <!doctype html>
@@ -20,7 +21,7 @@ $useridnow=$json1[0]['USERID'];
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     </head>
-    <body onload="searchviewhistory()">
+    <body onload="test()">
     <input type="text" id="useridnow" style="display:none" value=<?php echo '"'.$useridnow.'"';?>>
 <!--head bar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="width:80%;left:10%">
@@ -72,46 +73,37 @@ $useridnow=$json1[0]['USERID'];
 
   </div>
 </nav>
-
-
 <br>
 <br>
-
-<div id="list">
+<div style="position:relative;width:80%;left:10%">
+<ul class="list-group" >
+  <li class="list-group-item list-group-item-primary">
+  <a  data-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1" style="color:inherit">
+    Analyze top car brand for the top 50 buyers who bought most cars 
+  </a>
+  </li>
+  <div class="collapse" id="collapse1">
+  <div class="card card-body">
+   <canvas id="myChart" ></canvas>
+  </div>
+  </div>  
+  <li class="list-group-item list-group-item-primary">A simple primary list group item</li>
+  <li class="list-group-item list-group-item-secondary">A simple secondary list group item</li>
+  <li class="list-group-item list-group-item-success">A simple success list group item</li>
+  <li class="list-group-item list-group-item-danger">A simple danger list group item</li>
+  <li class="list-group-item list-group-item-warning">A simple warning list group item</li>
+  <li class="list-group-item list-group-item-info">A simple info list group item</li>
+  <li class="list-group-item list-group-item-light">A simple light list group item</li>
+  <li class="list-group-item list-group-item-dark">A simple dark list group item</li>
+</ul>
 </div>
 
-<br>
-<br>
-<nav aria-label="..." id="page">
- 
-</nav>
 
+<div style="position:relative;width:80%;left:10%">
 
-
-
-
-<script type="text/javascript">
-
-var result;
-var currentpage;
-var pagenumber;
-var pagesize=20;
-
-function searchviewhistory(){	
-	//var paraarray=getParams(window.location.toString());
-
-	var json= '{"action":"searchviewhistory","userid":'+document.getElementById('useridnow').value;
-	json=json+'}';
-	//alert(json);
-	var json1=datarequest(json);
-	//alert(json1);
-	result =  JSON.parse(json1);
-	pagenumber=Math.ceil(result.length/pagesize);
-	currentpage=0;
-	pagechange(1);
-	
-}
-
+</div>
+<script src="js/chartjs/dist/Chart.js"></script>
+<script>
 function toNonExponential(num) {
     var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/);
     return num.toFixed(Math.max(0, (m[1] || '').length - m[2]));
@@ -127,84 +119,59 @@ function getFullNum(num){
     return (num).toFixed(18).replace(/\.?0+$/, "");
 }
 
-function pagechange(number){
-	if(currentpage==number) return;
-	currentpage=number;
-	document.getElementById('list').innerHTML="";
-
-
-	//alert("111");
-	for(var i=(currentpage-1)*pagesize;i<currentpage*pagesize&&i<result.length;i++){
-		var card="<div class='card mb-3' style='width:80%;left:10%;height:15rem;'>";
-		card+="<div class='row no-gutters'>";
-		card+="<div class='col-md-4'>";
-		
-		card+="<img src='"+result[i]['PICTURE']+"' class='card-img' alt='...' style='height:15rem;width:auto'></div>";
-		
-		var xx=new Number(result[i]['PRICE']);
-		card+="<div class='col-md-8'><div class='card-body'>";
-		
-		card+="<h5 class='card-title'>"+result[i]['MODEL']+"</h5>";
-		
-		card+="<p class='card-text' >"+toNonExponential(xx)+"</p>";
-		
-		card+="<p class='card-text' style='text-align:right'><small class='text-muted'>"+result[i]['TIME']+"</small></p>";
-		card+="<div align='right'>";
-		card+="<a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary' >View</a>";
-		card+="</div></div></div></div></div><br>";
-		//alert(document.getElementById('list').innerHTML);
-		document.getElementById('list').innerHTML+=card;
+function test(){
+	var ctx = document.getElementById('myChart');
+	var json= '{"action":"analyze1"}';
+	alert(json);
+	var json1=datarequest(json);
+	//alert(json1);
+	result =  JSON.parse(json1);
+	var brand=new Array();
+	var number=new Array();
+	for(var i=0;i<result.length;i++){
+		brand[i]=result[i]['BRAND'];
+		number[i]=new Number(result[i]['NUM']);
 	}
+	var myChart = new Chart(ctx, {
+	    type: 'bar',
+	    data: {
+	        labels: brand,
+	        datasets: [{
+	            label: 'number of Cars',
+	            data: number,
+	            backgroundColor: [
+	                'rgba(255, 99, 132, 0.2)',
+	                'rgba(54, 162, 235, 0.2)',
+	                'rgba(255, 206, 86, 0.2)',
+	                'rgba(75, 192, 192, 0.2)',
+	                'rgba(153, 102, 255, 0.2)',
+	                'rgba(255, 159, 64, 0.2)'
+	            ],
+	            borderColor: [
+	                'rgba(255, 99, 132, 1)',
+	                'rgba(54, 162, 235, 1)',
+	                'rgba(255, 206, 86, 1)',
+	                'rgba(75, 192, 192, 1)',
+	                'rgba(153, 102, 255, 1)',
+	                'rgba(255, 159, 64, 1)'
+	            ],
+	            borderWidth: 1
+	        }]
+	    },
+	    options: {
+	        scales: {
+	            yAxes: [{
+	                ticks: {
+	                    beginAtZero: true
+	                }
+	            }]
+	        }
+	    }
+	});
 	
-	var pa="<ul class='pagination justify-content-center'>";
-	pa+="<li class='page-item'>";
-	pa+="<a class='page-link' href='javascript:void(0);'  onclick='pageminus();' aria-disabled='false'>Previous</a></li>";
-	for(var i=1;i<=1;i++){
-		if(i!=number){
-	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
-		}
-		else{
-			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
-		    pa+="</li>";		
-		}
-	}
-	if(number>4)
-		pa+="&nbsp;&nbsp;&nbsp;&nbsp;.&nbsp;.&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	var st=2;
-	if(number-2>st) st=number-2;
-	for(var i=st;i<=number+2&&i<pagenumber;i++){
-		if(i!=number){
-	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
-		}
-		else{
-			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
-		    pa+="</li>";		
-		}
-	}
-	if(number<pagenumber-3)
-		pa+="...";
-	if(pagenumber>1){
-	for(var i=pagenumber;i<=pagenumber;i++){
-		if(i!=number){
-	    	pa+="<li class='page-item'><a class='page-link' href='javascript:void(0);' onclick='pagechange("+i+");'>"+i+"</a></li>";
-		}
-		else{
-			pa+="<li class='page-item active' aria-current='page'> <a class='page-link' href='javascript:void(0);'>"+i+" <span class='sr-only'>(current)</span></a>";
-		    pa+="</li>";		
-		}
-	}
-	}
-	pa+="<li class='page-item'>";
-	pa+="<a class='page-link' href='javascript:void(0);'  onclick='pageplus();'>Next</a></li></ul>";
-	document.getElementById('page').innerHTML=pa;
-}
-function pageminus(){
-	if(currentpage>1)
-		pagechange(currentpage-1);
-}
-function pageplus(){
-	if(currentpage<pagenumber)
-		pagechange(currentpage+1);
+
+
+
 }
 
 function datarequest(json){
@@ -220,13 +187,13 @@ function datarequest(json){
      request.send(json);
      return ttttt;
 }
-
 </script>
 
 
 
 
-    <script src="jquery-3.3.1.js" ></script>
+
+ <script src="jquery-3.3.1.js" ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="js/bootstrap.min.js"></script>
   </body>

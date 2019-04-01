@@ -1,12 +1,11 @@
 <?php
 session_start();
 //if(!session_is_registered(userID)){
-//if(!isset($_SESSION['userID'])){
- //   header("location:Login.php");
-//}
-$json_data=$_SESSION['json_data'];
-$json1=(array) json_decode($json_data,1);
-$userid=$json1[0]['USERNAME'];
+if(isset($_SESSION['userID'])){
+    $json_data=$_SESSION['json_data'];
+    $json1=(array) json_decode($json_data,1);
+    $userid=$json1[0]['USERNAME'];
+}
 ?>
 
 <!doctype html>
@@ -88,7 +87,7 @@ $userid=$json1[0]['USERNAME'];
     
     if(!isset($_SESSION['userID'])){
         echo "<form class='form-inline my-2 my-lg-0'>";
-        echo "<button class='btn btn-outline-success my-2 my-sm-0' type='button' onclick='window.location='Login.php';'>Login</button>";
+        echo '<button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="window.location=\'Login.php\'">Login</button>';
         echo "</form>";
     }
     else{
@@ -604,15 +603,16 @@ function pagechange(number){
 	for(var i=(currentpage-1)*pagesize;i<currentpage*pagesize&&i<result.length;i++){
 		if(i%5==0)
 			card+="<br><br><div class='card-group' style='width:80%;left:10%'>";
-		card+="<div class='card' style='left:12.5%;width: 16%;height:20rem;position:relative;display:inline-block'>";
-		card+="<img src='"+result[i]['PICTURE']+"' class='card-img-top' alt='...' style='top:0px'>";
+		card+="<div class='card' style='left:12.5%;width: 16%;position:relative;display:inline-block'>";
+		card+="<img src='"+result[i]['PICTURE']+"' class='card-img-top' onerror="
+		card+='"this.src=\'images/unopen.png\'"style="top:0px">';
 		card+="<div class='card-body'>";
 		//var mo="";
 		//for(var j=result[i]['MODEL'].length;j<50;j++) mo+="&nbsp;";
 		card+="<p class='card-text'>"+result[i]['MODEL']+"</p>";
 		var xx=new Number(result[i]['PRICE']);
 		card+="<p class='card-text' style='text-align:right'>"+toNonExponential(xx)+"</p>";
-		card+="<a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary'>View</a>";
+		card+="<div style='position:absolute;bottom:5%'><a href='car_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary' >View</a></div>";
 		card+="</div>";
 		card+="</div>";
 		if(i%5==4)
