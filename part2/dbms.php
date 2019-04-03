@@ -27,7 +27,7 @@ switch($data["action"])
     case "searchdata":searchdata();break;
     case "getdataformat":getdataformat();break;
     case "deletedata":deletedata();break;
-    case "checkrequest":checkrequest();break;
+    case "analyze2":analyze2();break;
     case "changepassword":changepassword();break;
     case "forgetpassword":forgetpassword();break;
     case "analyze1":analyze1();break;
@@ -51,6 +51,20 @@ function analyze1(){
     }
     echo json_encode($jso);    
 }
+
+function analyze2(){
+    global $data;
+    global $con;
+    $query="select BRAND,(floor(KM_AGE/100000)*100000+50000) as KM,avg((PRICE_FOR_NEW_CAR-PRICE)/PRICE_FOR_NEW_CAR*100) as PER from CAR where brand in(select brand from (select brand,rank() over(order by count(DISTINCT CARID) desc) as ranked from car group by brand) where ranked<=10)group by brand,floor(KM_AGE/100000)*100000+50000 order by brand asc,floor(KM_AGE/100000)*100000+50000 asc";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
 function searchorderhistory(){
     global $data;
     global $con;
