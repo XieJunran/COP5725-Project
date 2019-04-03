@@ -84,10 +84,20 @@ else
   </li>
   <div class="collapse" id="collapse1">
   <div class="card card-body">
-   <canvas id="myChart" ></canvas>
+   <canvas id="myChart1" ></canvas>
   </div>
   </div>  
-  <li class="list-group-item list-group-item-primary">A simple primary list group item</li>
+  <li class="list-group-item list-group-item-primary">
+  <a  data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2" style="color:inherit">
+    Analyze relationship between price reduce rate and km_age for popular car brand 
+  </a>
+  </li>
+  <div class="collapse" id="collapse2">
+  <div align="center" class="card card-body">
+   <div id="myChart2"  style="width: 1200px;height:600px;"></div>
+  </div>
+  </div>  
+  
   <li class="list-group-item list-group-item-secondary">A simple secondary list group item</li>
   <li class="list-group-item list-group-item-success">A simple success list group item</li>
   <li class="list-group-item list-group-item-danger">A simple danger list group item</li>
@@ -103,6 +113,7 @@ else
 
 </div>
 <script src="js/chartjs/dist/Chart.js"></script>
+<script src="js/echart/dist/echarts.js"></script>
 <script>
 function toNonExponential(num) {
     var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/);
@@ -120,9 +131,9 @@ function getFullNum(num){
 }
 
 function test(){
-	var ctx = document.getElementById('myChart');
+	var ctx = document.getElementById('myChart1');
 	var json= '{"action":"analyze1"}';
-	alert(json);
+	//alert(json);
 	var json1=datarequest(json);
 	//alert(json1);
 	result =  JSON.parse(json1);
@@ -168,7 +179,87 @@ function test(){
 	        }
 	    }
 	});
+
+	json= '{"action":"analyze2"}';
+	//alert(json);
+	json1=datarequest(json);
+	//alert(json1);
+	result =  JSON.parse(json1);
+	brand=new Array();
+	number=new Array();
+	var j=0;
+	var l=0;
 	
+	for(var i=0;i<result.length;i++){		
+		if(i==0||result[i-1]['BRAND']!=result[i]['BRAND']){
+			number[j]=new Array();
+			brand[j++]=result[i]['BRAND'];
+			l=0;
+		}
+		
+		var km=new Number(result[i]['KM']);
+		if(km==l*100000+50000){
+			number[j-1][l++]=Math.round(new Number(result[i]['PER']));
+			
+		}
+		else
+			if(i==0||result[i]['BRAND']!=result[i-1]['BRAND'])
+				number[j-1][l++]=Math.round(new Number(result[i+1]['PER']));
+			else
+				number[j-1][l++]=Math.round(new Number(result[i-1]['PER']));			
+	}
+	
+	//varkmarray=new Array();
+	var kmarray=['50000','150000','250000','350000','450000','550000','650000','750000','850000'];
+	//for(var i=0;i<9;i++)
+	//	kmarray=(i*100000+50000)+"";
+	var myChart2 = echarts.init(document.getElementById('myChart2'));
+	var option = {
+		    title: {
+		        text: 'result'
+		    },
+		    tooltip: {
+		        trigger: 'axis'
+		    },
+		    legend: {
+		        data:brand
+		    },
+		    grid: {
+		        left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    toolbox: {
+		        feature: {
+		            saveAsImage: {}
+		        }
+		    },
+		    xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: kmarray
+		    },
+		    yAxis: {
+		        type: 'value'
+		    },
+		    series: [ 
+		    ]
+		};
+	 option.series=new Array();
+	    //alert("11");
+	    for(var i=0;i<brand.length;i++){
+	    	option.series[i]={};
+	    	option.series[i].name=brand[i];
+	    	
+	    	option.series[i].type='line';
+	    	
+	    	option.series[i].stack='avg';
+	    	
+	    	option.series[i].data=number[i];
+	    }
+	    //alert(JSON.stringify(option.yAxis));
+	myChart2.setOption(option);
 
 
 
