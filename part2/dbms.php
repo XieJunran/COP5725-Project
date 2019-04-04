@@ -17,24 +17,19 @@ global $con;
 $con=oci_connect($username,$password,$connection_string);
 switch($data["action"])
 {
-    case "deleteit":deleteit();break;
-    case "acceptit":acceptit();break;
-    case "searchcommunity":searchcommunity();break;
-    case "joincommunity":joincommunity();break;
-    case "createcommunity":createcommunity();break;
     case "logincheck":logincheck(); break;
     case "registercheck":registercheck();break;
-    case "searchdata":searchdata();break;
-    case "updateuserinfo":updateuserinfo();break;
-    case "userinfo":userinfo();break;
-    case "analyze2":analyze2();break;
     case "changepassword":changepassword();break;
     case "forgetpassword":forgetpassword();break;
-    case "analyze1":analyze1();break;
+    case "userinfo":userinfo();break;
+    case "updateuserinfo":updateuserinfo();break;
+    case "multisearch":multisearch();break;
     case "searchorderhistory":searchorderhistory();break;
     case "searchinterest":searchinterest();break;
     case "searchviewhistory":searchviewhistory();break;
-    case "multisearch":multisearch();break;
+    case "analyze1":analyze1();break;
+    case "analyze2":analyze2();break;
+    case "analyze3":analyze3();break;
     default:break;
 }
 
@@ -102,6 +97,19 @@ function analyze2(){
     echo json_encode($jso);
 }
 
+function analyze3(){
+    global $data;
+    global $con;
+    $query="select BRAND,SOLD_TIME,avg((PRICE_FOR_NEW_CAR-PRICE)/PRICE_FOR_NEW_CAR*100) as per from CAR where brand in(select brand from (select brand,rank() over(order by count(DISTINCT CARID) desc) as ranked from car group by brand) where ranked<=10)group by brand,SOLD_TIME order by brand asc,SOLD_TIME asc ";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
 function searchorderhistory(){
     global $data;
     global $con;
@@ -157,8 +165,9 @@ function multisearch(){
     global $data;
     global $con;
     $query="SELECT CARID,PICTURE,PRICE,MODEL FROM CAR WHERE 1=1";
-    $txt='%'.$data['txt'].'%';
+   
     if(array_key_exists('txt',$data)){
+        $txt='%'.$data['txt'].'%';
         $query=$query." AND MODEL LIKE :txt ";
         $stmt=oci_parse($con, $query);
  
