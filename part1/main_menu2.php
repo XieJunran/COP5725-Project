@@ -571,10 +571,10 @@ function search(){
 			
 	}
 	json=json+'}';
-	alert(json);
+	//alert(json);
 	var json1=datarequest(json);
 	result =  JSON.parse(json1);
-	alert(json1);	
+	//alert(json1);	
 	pagenumber=Math.ceil(result.length/pagesize);
 	currentpage=0;
 	pagechange(1);
