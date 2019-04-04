@@ -25,8 +25,8 @@ switch($data["action"])
     case "logincheck":logincheck(); break;
     case "registercheck":registercheck();break;
     case "searchdata":searchdata();break;
-    case "getdataformat":getdataformat();break;
-    case "deletedata":deletedata();break;
+    case "updateuserinfo":updateuserinfo();break;
+    case "userinfo":userinfo();break;
     case "analyze2":analyze2();break;
     case "changepassword":changepassword();break;
     case "forgetpassword":forgetpassword();break;
@@ -39,6 +39,43 @@ switch($data["action"])
 }
 
 oci_close($con);
+
+function updateuserinfo(){
+    global $data;
+    global $con;
+    $userid=$data["userid"];
+    $contact=$data["CONTACT_INFORMATION"];
+    $ssn=$data["SSN"];
+    $passport=$data["PASSPORT_NUMBER"];
+    $credit=$data["CREDIT_CARD_NUMBER"];  
+    $query="UPDATE USER_INFO SET SSN=:ssn,CONTACT_INFORMATION=:contact,PASSPORT_NUMBER=:passport,CREDIT_CARD_NUMBER=:credit WHERE USERID=:userid";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_bind_by_name($stmt, ":contact",$contact);
+    oci_bind_by_name($stmt, ":ssn",$ssn);
+    oci_bind_by_name($stmt, ":passport",$passport);
+    oci_bind_by_name($stmt, ":credit",$credit);
+    oci_execute($stmt);
+    $stmt=oci_parse($con, 'commit');
+    oci_execute($stmt);
+    echo "success!";
+}
+
+function userinfo(){
+    global $data;
+    global $con;
+    $userid=$data["userid"];
+    $query="SELECT * FROM USER_INFO WHERE USERID=:userid";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ':userid', $userid);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);  
+    
+}
 function analyze1(){
     global $data;
     global $con;
