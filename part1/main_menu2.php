@@ -571,10 +571,10 @@ function search(){
 			
 	}
 	json=json+'}';
-	//alert(json);
+	alert(json);
 	var json1=datarequest(json);
 	result =  JSON.parse(json1);
-	//alert(result);	
+	alert(json1);	
 	pagenumber=Math.ceil(result.length/pagesize);
 	currentpage=0;
 	pagechange(1);
@@ -672,10 +672,9 @@ function pageplus(){
 	if(currentpage<pagenumber)
 		pagechange(currentpage+1);
 }
-function searchtxt(){
-
-	
-	
+function searchtxt(){	
+	if(document.getElementById("sear").value!='')
+		window.location.href='main_menu2.php?txt='+document.getElementById("sear").value;
 }
 
 
