@@ -157,6 +157,21 @@ function multisearch(){
     global $data;
     global $con;
     $query="SELECT CARID,PICTURE,PRICE,MODEL FROM CAR WHERE 1=1";
+    $txt='%'.$data['txt'].'%';
+    if(array_key_exists('txt',$data)){
+        $query=$query." AND MODEL LIKE :txt ";
+        $stmt=oci_parse($con, $query);
+ 
+        oci_bind_by_name($stmt, ":txt",$txt);
+       
+        oci_execute($stmt);
+        $jso=array();
+        while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+            $jso[] = $row;
+        }
+        echo json_encode($jso);
+        return;
+    }
     if(array_key_exists('brand',$data)){
         $query=$query." AND BRAND=:brand ";   
     }
