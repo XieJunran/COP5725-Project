@@ -60,7 +60,7 @@ else
         echo $userid;
         echo "</a>";
         echo "<div class='dropdown-menu' aria-labelledby='navbarDropdown'>";
-        echo "<a class='dropdown-item' href='#'>Account</a>";
+        echo "<a class='dropdown-item' href='userprofile.php'>Account</a>";
         echo "<a class='dropdown-item' href='orderhistory.php'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
         echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";
@@ -87,7 +87,7 @@ else
    <canvas id="myChart1" ></canvas>
   </div>
   </div>  
-  <li class="list-group-item list-group-item-primary">
+  <li class="list-group-item list-group-item-secondary">
   <a  data-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapse2" style="color:inherit">
     Analyze relationship between price reduce rate and km_age for popular car brand 
   </a>

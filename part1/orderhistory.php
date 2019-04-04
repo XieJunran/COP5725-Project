@@ -19,6 +19,7 @@ $useridnow=$json1[0]['USERID'];
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    
     </head>
     <body onload="searchviewhistory()">
     <input type="text" id="useridnow" style="display:none" value=<?php echo '"'.$useridnow.'"';?>>
@@ -59,10 +60,10 @@ $useridnow=$json1[0]['USERID'];
         echo $userid;
         echo "</a>";
         echo "<div class='dropdown-menu' aria-labelledby='navbarDropdown'>";
-        echo "<a class='dropdown-item' href='#'>Account</a>";
+        echo "<a class='dropdown-item' href='interestlist.php'>Account</a>";
         echo "<a class='dropdown-item' href='orderhistory.php'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
-        echo "<a class='dropdown-item' href='interest.php'>Interesting List</a>";
+        echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";
         echo "<div class='dropdown-divider'></div>";
         echo "<a class='dropdown-item' href='Logout.php'>Exit</a>";
         echo "</div>";

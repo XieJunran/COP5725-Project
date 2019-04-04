@@ -19,6 +19,7 @@ if(isset($_SESSION['userID'])){
     <link rel="stylesheet" href="css/bootstrap.min.css">
     </head>
     <body onload="search()">
+    
 <!--head bar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="width:80%;left:10%">
   <a class="navbar-brand" href="#">SecondHandCar</a>
@@ -95,7 +96,7 @@ if(isset($_SESSION['userID'])){
         echo $userid;
         echo "</a>";
         echo "<div class='dropdown-menu' aria-labelledby='navbarDropdown'>";
-        echo "<a class='dropdown-item' href='#'>Account</a>";
+        echo "<a class='dropdown-item' href='userprofile.php'>Account</a>";
         echo "<a class='dropdown-item' href='orderhistory.php'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
         echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";

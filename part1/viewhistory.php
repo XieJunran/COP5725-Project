@@ -59,7 +59,7 @@ $useridnow=$json1[0]['USERID'];
         echo $userid;
         echo "</a>";
         echo "<div class='dropdown-menu' aria-labelledby='navbarDropdown'>";
-        echo "<a class='dropdown-item' href='#'>Account</a>";
+        echo "<a class='dropdown-item' href='userprofile.php'>Account</a>";
         echo "<a class='dropdown-item' href='orderhistory.php'>Order history</a>";
         echo "<a class='dropdown-item' href='viewhistory.php'>View history</a>";
         echo "<a class='dropdown-item' href='interestlist.php'>Interesting List</a>";
