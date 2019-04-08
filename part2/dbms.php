@@ -30,6 +30,11 @@ switch($data["action"])
     case "analyze1":analyze1();break;
     case "analyze2":analyze2();break;
     case "analyze3":analyze3();break;
+    case "analyze4":analyze4();break;
+    case "analyze5":analyze5();break;
+    case "analyze6":analyze6();break;
+    case "analyze7":analyze7();break;
+    case "analyze8":analyze8();break;
     default:break;
 }
 
@@ -109,6 +114,79 @@ function analyze3(){
     }
     echo json_encode($jso);
 }
+function analyze4(){
+    global $data;
+    global $con;
+    $year=$data['year'];
+    $state=$data['state'];
+    $query="select * from (select BRAND,count(distinct c.carid) as num from car c,post p where c.transaction_state=:state and c.carid=p.carid and p.time between  TO_DATE ('".$year."-JAN-1 00:00:00','yyyy-mon-dd hh24:mi:ss') and TO_DATE ('".$year."-DEC-31 23:59:59','yyyy-mon-dd hh24:mi:ss') group by brand order by count(distinct c.carid) desc) t where rownum<=10";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":state",$state);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
+function analyze5(){
+    global $data;
+    global $con;
+    $query="select * from (select BRAND,avg(SOLD_TIME)as num from car where brand in(select brand from car group by brand having count(distinct carid)>10)group by BRAND order by avg(SOLD_TIME) desc) t where rownum<=10";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
+function analyze6(){
+    global $data;
+    global $con;
+    $year=$data['year'];
+    $query="select * from (select BRAND,count(distinct c.carid) as num from car c,order_history o where c.carid=o.carid and o.transaction_time between  TO_DATE ('".$year."-JAN-1 00:00:00','yyyy-mon-dd hh24:mi:ss') and TO_DATE ('".$year."-DEC-31 23:59:59','yyyy-mon-dd hh24:mi:ss') group by brand order by count(distinct c.carid) desc) t where rownum<=10";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
+function analyze7(){
+    global $data;
+    global $con;
+    
+    $query="select distinct c.state,t.num from country_info c,(select * from (select transaction_state as state, count(distinct carid) as num from car group by transaction_state order by count(distinct carid) desc) where rownum<=10) t where c.abbreviation=t.state order by t.num desc";
+    $stmt = oci_parse($con, $query);
+    
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);   
+}
+
+function analyze8(){
+    global $data;
+    global $con;
+    $brand='%'.$data['brand'].'%';
+    $query="select distinct c.state,t.num from country_info c,(select * from (select transaction_state as state, count(distinct carid) as num from car where brand like :brand group by transaction_state order by count(distinct carid) desc) where rownum<=10) t where c.abbreviation=t.state order by t.num desc";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":brand",$brand);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
 
 function searchorderhistory(){
     global $data;
