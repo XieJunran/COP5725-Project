@@ -27,6 +27,9 @@ switch($data["action"])
     case "searchorderhistory":searchorderhistory();break;
     case "searchinterest":searchinterest();break;
     case "searchviewhistory":searchviewhistory();break;
+    case "addcar":addcar();break;
+    case "searchzip":searchzip();break;
+    case "searchcity":searchcity();break;
     case "analyze1":analyze1();break;
     case "analyze2":analyze2();break;
     case "analyze3":analyze3();break;
@@ -40,6 +43,118 @@ switch($data["action"])
 
 oci_close($con);
 
+function searchcity(){
+    global $data;
+    global $con;
+    $state=$data['state'];
+    $query="SELECT DISTINCT CITY FROM COUNTRY_INFO WHERE ABBREVIATION=:state ORDER BY CITY";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":state",$state);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso); 
+}
+
+function searchzip(){
+    global $data;
+    global $con;
+    $state=$data['state'];
+    $city=$data['city'];
+    $query="SELECT DISTINCT ZIP_CODE FROM COUNTRY_INFO WHERE ABBREVIATION=:state AND CITY=:city ORDER BY ZIP_CODE";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":state",$state);
+    oci_bind_by_name($stmt, ":city",$city);
+    oci_execute($stmt);
+    $jso=array();
+    while ($row = oci_fetch_array($stmt,OCI_ASSOC)) {
+        $jso[] = $row;
+    }
+    echo json_encode($jso);
+}
+
+
+function addcar(){
+    global $data;
+    global $con;
+    $userid=$data["Userid"];
+    $soldtime=$data["Soldtime"];
+    $kmage=$data["Kmage"];
+    $brand=$data["Brand"];
+    $model=$data["Model"];
+    $NewPrice=$data["NewPrice"];
+    $Price=$data["Price"];
+    $State=$data["State"];
+    $City=$data["City"];
+    $Zip=$data["Zip"];
+    $GearBox=$data["GearBox"];
+    $Color=$data["Color"];
+    $Insurance=$data["Insurance"];
+    $query="UPDATE INFO SET MAXCARID=MAXCARID+1";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $query="SELECT * FROM INFO";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $row = oci_fetch_array($stmt,OCI_ASSOC);
+    $caridnum=$row['MAXCARID']+1;
+    $stmt=oci_parse($con, 'commit');
+    oci_execute($stmt);
+    $carid='';
+    for($i=0;$i<4;$i++){
+        $carid=($caridnum%10).$carid;
+        $caridnum=$caridnum/10;
+    }
+    $carid='-'.$carid;
+    for($i=0;$i<4;$i++){
+        $carid=($caridnum%10).$carid;
+        $caridnum=$caridnum/10;
+    }
+    $query="INSERT INTO CAR VALUES(:carid,:gearbox,:kmage,:picture,:state,:city,:zip,:brand,:model,:price,:newprice,:soldtime,:insurance,:color)";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":carid",$carid);
+    
+    if($GearBox=='Auto')
+        $GearBox='Automatic';
+    else 
+        $GearBox='Manual';
+        oci_bind_by_name($stmt, ":gearbox",$GearBox);
+    oci_bind_by_name($stmt, ":kmage",$kmage);
+    $uurl='10.227.162.163/SecondCarWeb/part1/img/carimg/'.$carid.'png';
+    oci_bind_by_name($stmt, ":picture",$uurl);
+    oci_bind_by_name($stmt, ":state",$State);
+    oci_bind_by_name($stmt, ":city",$City);
+    oci_bind_by_name($stmt, ":zip",$Zip);
+    oci_bind_by_name($stmt, ":brand",$brand);
+    oci_bind_by_name($stmt, ":model",$model);
+    oci_bind_by_name($stmt, ":price",$Price);
+    oci_bind_by_name($stmt, ":newprice",$NewPrice);
+    oci_bind_by_name($stmt, ":soldtime",$soldtime);
+    if($Insurance=='YES')
+        $Insurance='Y';
+    else
+        $Insurance='N';
+    oci_bind_by_name($stmt, ":insurance",$Insurance);
+    oci_bind_by_name($stmt, ":color",$Color);
+    oci_execute($stmt);
+    $stmt=oci_parse($con, 'commit');
+    oci_execute($stmt);
+    
+    $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);
+    $query="INSERT INTO POST VALUES (:userid,:carid,(SELECT SYSDATE FROM DUAL))";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_bind_by_name($stmt, ":carid",$carid);
+    oci_execute($stmt);
+    $query="COMMIT";
+    $stmt = oci_parse($con, $query);
+    oci_execute($stmt);   
+    echo "success!".$carid;
+}
 function updateuserinfo(){
     global $data;
     global $con;
