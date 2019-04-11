@@ -77,7 +77,7 @@ if($thisuserid==''){
         <a class="nav-link" href="main_menu2.php">Buy</a>
       </li>
        <li class="nav-item">
-        <a class="nav-link" href="#">Sell</a>
+        <a class="nav-link"  href="post.php">Sell</a>
       </li>
      
       <li class="nav-item">

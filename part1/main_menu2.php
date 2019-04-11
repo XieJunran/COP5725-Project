@@ -1,11 +1,12 @@
 <?php
 session_start();
 //if(!session_is_registered(userID)){
-if(isset($_SESSION['userID'])){
-    $json_data=$_SESSION['json_data'];
-    $json1=(array) json_decode($json_data,1);
-    $userid=$json1[0]['USERNAME'];
+if(!isset($_SESSION['userID'])){
+    header("location:Login.php");
 }
+   $json_data=$_SESSION['json_data'];
+   $json1=(array) json_decode($json_data,1);
+   $userid=$json1[0]['USERNAME'];
 ?>
 
 <!doctype html>
@@ -36,7 +37,7 @@ if(isset($_SESSION['userID'])){
         <a class="nav-link" href="main_menu2.php">Buy</a>
       </li>
        <li class="nav-item">
-        <a class="nav-link" href="#">Sell</a>
+        <a class="nav-link" href="post.php">Sell</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -363,7 +364,6 @@ if(isset($_SESSION['userID'])){
 <nav aria-label="..." id="page">
  
 </nav>
-
 
 
 
