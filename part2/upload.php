@@ -11,20 +11,25 @@ if ($file["error"] == 0) {
             if($_REQUEST['type']=='user')
                 $imgname = "../part1/img/userimg/".$_REQUEST['userid'].".png";
             else
-                $imgname = "../part1/img/carimg/".$_REQUEST['carid'].".png";
-            unlink($imgname);
+                if($_REQUEST['type']=='car')
+                    $imgname = "../part1/img/carimg/".$_REQUEST['carid'].".png";
+                    else {
+                        echo "failed";
+                        return;
+                    }
+            @unlink($imgname);
             $bol = move_uploaded_file($file["tmp_name"], $imgname);
             if($bol){
                 echo "success！";
             } else {
                 echo "fail！";
-            };
-        };
+            }
+        }
     } else {
         echo "no picture";
-    };
+    }
 } else {
     echo $file["error"];
-};
+}
    
 ?>
