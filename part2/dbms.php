@@ -30,6 +30,8 @@ switch($data["action"])
     case "addcar":addcar();break;
     case "searchzip":searchzip();break;
     case "searchcity":searchcity();break;
+    case "dislike":dislike();break;
+    case "interest":interest();break;
     case "analyze1":analyze1();break;
     case "analyze2":analyze2();break;
     case "analyze3":analyze3();break;
@@ -42,6 +44,36 @@ switch($data["action"])
 }
 
 oci_close($con);
+
+function dislike(){
+    global $data;
+    global $con;
+    $userid=$data['userid'];
+    $carid=$data['carid'];
+    $query="DELETE FROM INTEREST WHERE USERID=:userid AND CARID=:carid";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_bind_by_name($stmt, ":carid",$carid);
+    oci_execute($stmt);
+    $stmt = oci_parse($con, "commit");
+    oci_execute($stmt);
+    echo 'success!'; 
+}
+
+function interest(){
+    global $data;
+    global $con;
+    $userid=$data['userid'];
+    $carid=$data['carid'];
+    $query="INSERT INTO INTEREST VALUES(:userid,:carid)";
+    $stmt = oci_parse($con, $query);
+    oci_bind_by_name($stmt, ":userid",$userid);
+    oci_bind_by_name($stmt, ":carid",$carid);
+    oci_execute($stmt);
+    $stmt = oci_parse($con, "commit");
+    oci_execute($stmt);
+    echo 'success!';
+}
 
 function searchcity(){
     global $data;
@@ -310,7 +342,7 @@ function searchorderhistory(){
     $query="alter session set nls_date_format = 'yyyy-mm-dd hh24:mi:ss'";
     $stmt = oci_parse($con, $query);
     oci_execute($stmt);
-    $query="SELECT * FROM (CAR NATURAL JOIN ORDER_HISTORY) WHERE BUYER=:userid ORDER BY TIME DESC ";
+    $query="SELECT * FROM (CAR NATURAL JOIN ORDER_HISTORY) WHERE BUYER=:userid ORDER BY TRANSACTION_TIME DESC ";
     $stmt = oci_parse($con, $query);
     oci_bind_by_name($stmt, ":userid",$userid);
     oci_execute($stmt);
@@ -357,7 +389,7 @@ function searchinterest(){
 function multisearch(){
     global $data;
     global $con;
-    $query="SELECT CARID,PICTURE,PRICE,MODEL FROM CAR WHERE 1=1";
+    $query="SELECT CARID,PICTURE,PRICE,MODEL FROM CAR WHERE (CARID NOT IN (SELECT DISTINCT CARID FROM ORDER_HISTORY)) ";
    
     if(array_key_exists('txt',$data)){
         $txt='%'.$data['txt'].'%';
@@ -376,6 +408,9 @@ function multisearch(){
     }
     if(array_key_exists('brand',$data)){
         $query=$query." AND BRAND=:brand ";   
+    }
+    if(array_key_exists('color',$data)){
+        $query=$query." AND COLOR=:color ";
     }
     if(array_key_exists('prmin',$data)){
         $query=$query." AND PRICE>=:prmin ";
@@ -401,6 +436,9 @@ function multisearch(){
     $stmt=oci_parse($con, $query);
     if(array_key_exists('brand',$data)){
         oci_bind_by_name($stmt, ":brand",$data['brand']);
+    }
+    if(array_key_exists('color',$data)){
+        oci_bind_by_name($stmt, ":color",$data['color']);
     }
     if(array_key_exists('prmin',$data)){
         oci_bind_by_name($stmt, ":prmin",$data['prmin']);
