@@ -340,8 +340,40 @@ if(!isset($_SESSION['userID'])){
   </div>
   
   
+  
+  <!--color -->
+  <div class="btn-group">
+  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <?php   
+    $url=$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    $color=getUrlParam('color',$url);
+    if($color!=''){
+        echo $color;
+    }
+    else 
+        echo "COLOR";
+    ?>
+  </button>
+  <div class="dropdown-menu">
+  <a class="dropdown-item" href="javascript:void(0);" onclick="changecolor('NoLimit');">No Limit</a>
+  <?php
+  $username="huanbin";
+  $password="24361Zhb1152";
+  $connection_string="oracle.cise.ufl.edu:1521/orcl";
+  $con=oci_connect($username,$password,$connection_string);
+  $query="SELECT DISTINCT COLOR FROM CAR WHERE COLOR IS NOT NULL ORDER BY COLOR";
+  $stmt = oci_parse($con, $query);
+  oci_execute($stmt); 
+  while(($re=oci_fetch_array($stmt,OCI_ASSOC))){
+      echo "<a class='dropdown-item' href='javascript:void(0);' onclick='changecolor(".$re['COLOR'].");'>".$re['COLOR']."</a>";
+  }
+  oci_close($con);
+  ?>
+</div>
+  </div>
+  
+  
   </li>
-  <li class="list-group-item">remain for extra</li>
  
 </ul>
 </div>
@@ -350,8 +382,13 @@ if(!isset($_SESSION['userID'])){
 
 <ul class="list-group"  style="position:relative;left:10%;width:80%;text-align:right">
 <li class="list-group-item">Sort &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <a href='javascript:void(0);' onclick='changesort("PRICE")'>Price</a>
+  <a href='javascript:void(0);' onclick='changesort("PRICE")'>PRICE</a>
+  &nbsp;
+  <a href='javascript:void(0);' onclick='changesort("KM_AGE")'>KMAGE</a>
+  &nbsp;
+  <a href='javascript:void(0);' onclick='changesort("SOLD_TIME")'>SOLDTIME</a>
 </li>
+
 </ul>
 <br>
 <br>
@@ -454,19 +491,37 @@ function changeURLArg(url,arg,arg_val){
 } 
 
 function changestate(state){
-	var url=window.location.toString();
+	var url0=window.location.toString();
+	var url=url0;
+	if(getParam('txt')!="")
+		url=delParam(url0,'txt');
 	var url1=changeURLArg(url,'state',state);
 	window.location.href=url1;
 }
 
 function changebrand(brand){
-	var url=window.location.toString();
+	var url0=window.location.toString();
+	var url=url0;
+	if(getParam('txt')!="")
+		url=delParam(url0,'txt');
 	var url1=changeURLArg(url,'brand',brand);
 	window.location.href=url1;
 }
 
+function changecolor(color){
+	var url0=window.location.toString();
+	var url=url0;
+	if(getParam('txt')!="")
+		url=delParam(url0,'txt');
+	var url1=changeURLArg(url,'color',color);
+	window.location.href=url1;
+}
+
 function changeprice(min,max){
-	var url=window.location.toString();
+	var url0=window.location.toString();
+	var url=url0;
+	if(getParam('txt')!="")
+		url=delParam(url0,'txt');
 	var url1=changeURLArg(url,'prmin',min);
 	var url2=changeURLArg(url1,'prmax',max);
 	window.location.href=url2;
@@ -484,12 +539,18 @@ function confirmprice(){
 }
 function changegearbox(type){
 	if(type=='NoLimit'){
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=delParam(url,'gearbox');
 		window.location.href=url1;
 	}
 	else{
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=changeURLArg(url,'gearbox',type);
 		window.location.href=url1;
 	}
@@ -497,12 +558,18 @@ function changegearbox(type){
 
 function changekmage(km){
 	if(km=='NoLimit'){
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=delParam(url,'km_age');
 		window.location.href=url1;
 	}
 	else{
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=changeURLArg(url,'km_age',km);
 		window.location.href=url1;
 	}
@@ -530,12 +597,18 @@ function changesort(type){
 
 function changeselltime(time){
 	if(time=='NoLimit'){
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=delParam(url,'sell_time');
 		window.location.href=url1;
 	}
 	else{
-		var url=window.location.toString();
+		var url0=window.location.toString();
+		var url=url0;
+		if(getParam('txt')!="")
+			url=delParam(url0,'txt');
 		var url1=changeURLArg(url,'sell_time',time);
 		window.location.href=url1;
 	}

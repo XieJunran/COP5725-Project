@@ -150,7 +150,7 @@ function pagechange(number){
 		card+="<p class='card-text' >"+toNonExponential(xx)+"</p>";
 		card+="<p class='card-text' style='text-align:right'><small class='text-muted'>"+result[i]['TRANSACTION_TIME']+"</small></p>";
 		card+="<div align='right'>";
-		card+="<a href='order_page.php?orderid="+result[i]['ORDERID']+"' class='btn btn-primary' >View</a>";
+		card+="<a href='order_page.php?carid="+result[i]['CARID']+"' class='btn btn-primary' >View</a>";
 		card+="</div></div></div></div></div><br>";
 		//alert(document.getElementById('list').innerHTML);
 		document.getElementById('list').innerHTML+=card;
